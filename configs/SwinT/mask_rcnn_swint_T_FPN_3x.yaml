@@ -1,0 +1,31 @@
+_BASE_: "../Base-RCNN-FAN.yaml"
+MODEL:
+  WEIGHTS: "weights/swin_tiny_patch4_window7_224_d2.pth"
+  PIXEL_MEAN: [ 123.675, 116.28, 103.53 ]
+  PIXEL_STD: [ 58.395, 57.12, 57.375 ]
+  MASK_ON: True
+  RESNETS:
+    DEPTH: 50
+  BACKBONE:
+    NAME: "build_swint_fan_backbone"
+  SWINT:
+    OUT_FEATURES: [ "stage2", "stage3", "stage4", "stage5" ]
+  FPN:
+    IN_FEATURES: [ "stage2", "stage3", "stage4", "stage5" ]
+#  DENSITY_HEAD:
+#    IN_FEATURES: [ "stage5"]
+  DENSITY_ON: True   # 是否启用计数头
+INPUT:
+  FORMAT: "RGB"
+SOLVER:
+  STEPS: (210000, 250000)
+  MAX_ITER: 270000
+  WEIGHT_DECAY: 0.05
+  BASE_LR: 0.0001
+  AMP:
+    ENABLED: True
+TEST:
+  EVAL_PERIOD: 20000
+DATASETS:
+  TRAIN: ("rpc_2019_train_render_density_map", "rpc_2019_train_syn_density_map")
+  TEST: ("rpc_2019_val",)
